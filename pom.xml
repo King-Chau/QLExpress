@@ -6,7 +6,7 @@
     <groupId>com.alibaba</groupId>
     <artifactId>QLExpress</artifactId>
     <packaging>jar</packaging>
-    <version>3.3.4</version>
+    <version>3.3.4-scp-SNAPSHOT</version>
     <name>QLExpress</name>
     <description>QLExpress is a powerful, lightweight, dynamic language for the Java platform aimed at improving developers’ productivity in different business scenes.
     </description>
@@ -93,12 +93,12 @@
 
     <distributionManagement>
         <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <id>neo-data-snapshort</id>
+            <url>https://ndp-infra.stepfun-inc.com/repository/neo-data-snapshort/</url>
         </snapshotRepository>
         <repository>
-            <id>oss</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+            <id>neo-data-releases</id>
+            <url>https://ndp-infra.stepfun-inc.com/repository/neo-data-releases/</url>
         </repository>
     </distributionManagement>
 

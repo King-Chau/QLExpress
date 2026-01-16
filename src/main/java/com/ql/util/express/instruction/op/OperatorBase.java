@@ -3,9 +3,11 @@ package com.ql.util.express.instruction.op;
 import java.util.List;
 
 import com.ql.util.express.ArraySwap;
+import com.ql.util.express.ExecuteTimeout;
 import com.ql.util.express.ExpressUtil;
 import com.ql.util.express.InstructionSetContext;
 import com.ql.util.express.OperateData;
+import com.ql.util.express.RunEnvironment;
 import com.ql.util.express.exception.QLException;
 import com.ql.util.express.instruction.opdata.OperateDataAttr;
 
@@ -51,9 +53,20 @@ public abstract class OperatorBase {
         return result;
     }
 
-    public OperateData execute(InstructionSetContext context, ArraySwap list, List<String> errorList) throws Exception {
+    /**
+     * 执行操作符（带运行时环境）
+     *
+     * @param context 指令集上下文
+     * @param list 操作数列表
+     * @param errorList 错误列表
+     * @param environment 运行时环境（可为null，保持向后兼容）
+     * @return 操作结果
+     * @throws Exception
+     */
+    public OperateData execute(InstructionSetContext context, ArraySwap list, List<String> errorList,
+                               RunEnvironment environment) throws Exception {
         OperateData result;
-        result = this.executeInner(context, list);
+        result = this.executeInner(context, list, environment);
         //输出错误信息
         if (errorList != null && this.errorInfo != null && result != null) {
             Object obj = result.getObject(context);
@@ -67,6 +80,16 @@ public abstract class OperatorBase {
         return result;
     }
 
+    /**
+     * 执行操作符（保持向后兼容）
+     *
+     * @deprecated 使用 {@link #execute(InstructionSetContext, ArraySwap, List, RunEnvironment)} 代替
+     */
+    @Deprecated
+    public OperateData execute(InstructionSetContext context, ArraySwap list, List<String> errorList) throws Exception {
+        return execute(context, list, errorList, null);
+    }
+
     @Override
     public String toString() {
         if (this.aliasName != null) {
@@ -74,6 +97,21 @@ public abstract class OperatorBase {
         } else {
             return this.name;
         }
+    }
+
+    /**
+     * 执行操作符内部逻辑（带运行时环境）
+     * 子类可以覆盖此方法以获取运行时环境信息（如超时时间）
+     *
+     * @param parent 指令集上下文
+     * @param list 操作数列表
+     * @param environment 运行时环境（可为null）
+     * @return 操作结果
+     * @throws Exception
+     */
+    public OperateData executeInner(InstructionSetContext parent, ArraySwap list, RunEnvironment environment) throws Exception {
+        // 默认实现调用旧方法，保持向后兼容
+        return this.executeInner(parent, list);
     }
 
     public abstract OperateData executeInner(InstructionSetContext parent, ArraySwap list) throws Exception;

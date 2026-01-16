@@ -29,7 +29,7 @@ public class InstructionOperator extends Instruction {
         InstructionSetContext instructionSetContext = environment.getContext();
         ArraySwap parameters = environment.popArray(this.opDataNumber);
         try {
-            OperateData result = this.operator.execute(instructionSetContext, parameters, errorList);
+            OperateData result = this.operator.execute(instructionSetContext, parameters, errorList, environment);
             environment.push(result);
             environment.programPointAddOne();
         } catch (QLException e) {

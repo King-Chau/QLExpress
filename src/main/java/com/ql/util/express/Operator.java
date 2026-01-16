@@ -13,6 +13,38 @@ import com.ql.util.express.instruction.op.OperatorBase;
  * @author xuannan
  */
 public abstract class Operator extends OperatorBase {
+
+    /**
+     * 执行操作符内部逻辑（带运行时环境）
+     * 子类可以覆盖此方法以获取运行时环境信息（如超时时间）
+     *
+     * @param parent 指令集上下文
+     * @param list 操作数列表
+     * @param environment 运行时环境（可为null）
+     * @return 操作结果
+     * @throws Exception
+     */
+    @Override
+    public OperateData executeInner(InstructionSetContext parent, ArraySwap list, RunEnvironment environment) throws Exception {
+        Object[] parameters = new Object[list.length];
+        for (int i = 0; i < list.length; i++) {
+            if (list.get(i) == null && QLExpressRunStrategy.isAvoidNullPointer()) {
+                parameters[i] = null;
+            } else {
+                parameters[i] = list.get(i).getObject(parent);
+            }
+        }
+        Object result = this.executeInner(parent, parameters, environment);
+        if (result != null && result.getClass().equals(OperateData.class)) {
+            throw new QLException("操作符号定义的返回类型错误：" + this.getAliasName());
+        }
+        if (result == null) {
+            return OperateDataCacheManager.fetchOperateData(null, null);
+        } else {
+            return OperateDataCacheManager.fetchOperateData(result, ExpressUtil.getSimpleDataType(result.getClass()));
+        }
+    }
+
     @Override
     public OperateData executeInner(InstructionSetContext parent, ArraySwap list) throws Exception {
         Object[] parameters = new Object[list.length];
@@ -34,6 +66,21 @@ public abstract class Operator extends OperatorBase {
             //return new OperateData(result,ExpressUtil.getSimpleDataType(result.getClass()));
             return OperateDataCacheManager.fetchOperateData(result, ExpressUtil.getSimpleDataType(result.getClass()));
         }
+    }
+
+    /**
+     * 执行操作符内部逻辑（带运行时环境和上下文）
+     * 子类可以覆盖此方法以获取运行时环境信息（如超时时间）
+     *
+     * @param parent 指令集上下文
+     * @param list 参数列表（已转换为Object[]）
+     * @param environment 运行时环境（可为null）
+     * @return 执行结果
+     * @throws Exception
+     */
+    public Object executeInner(InstructionSetContext parent, Object[] list, RunEnvironment environment) throws Exception {
+        // 默认实现调用旧方法，保持向后兼容
+        return this.executeInner(list);
     }
 
     public abstract Object executeInner(Object[] list) throws Exception;
